@@ -12,3 +12,67 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+model Student{
+  id       String  @id @default(uuid())
+  roll_no  String  @unique
+  branch   Branch
+  state    String
+  gender   Gender
+  room_no  String
+  Room     Room @relation(fields: [room_no] , references: [id])
+  mess_concessions   MessConcession[]
+  out_passes         OutPass[]
+}
+
+model Room {
+  id       String @id @default(uuid())
+  room_no  Int @unique
+  floor    Int 
+  students Student[]
+}
+
+model Staff {
+  id       String @id @default(uuid())
+  username String @unique
+  password String
+  role     Role
+}
+
+model MessConcession{
+  id          String @id @default(uuid())
+  image_url   String
+  days        Int
+  start_date  DateTime
+  End_date    DateTime
+  amount      Int
+  student_id  String
+  student     Student @relation(fields: [student_id], references: [id])
+}
+
+model OutPass {
+  id          String @id @default(uuid())
+  image_url   String
+  days        Int
+  start_date  DateTime
+  end_date    DateTime
+  student_id  String
+  student     Student @relation(fields: [student_id], references: [id])
+}
+
+enum Branch{
+  CSE
+  DSAI
+  ECE
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum Role {
+  WARDEN
+  STAFF
+}
