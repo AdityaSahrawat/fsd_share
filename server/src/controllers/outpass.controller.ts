@@ -17,7 +17,7 @@ export async function createOutPass(req: Request, res: Response) {
     end_date,
     student_id,
   } = req.body as {
-    image_url?: string;
+    image_url?: string | null;
     imageDataUrl?: string;
     image_data_url?: string;
     imageBase64?: string;
@@ -34,7 +34,7 @@ export async function createOutPass(req: Request, res: Response) {
     return res.status(400).json({ error: "days, start_date, end_date, student_id are required" });
   }
 
-  let finalImageUrl = image_url;
+  let finalImageUrl = image_url ?? undefined;
   const dataUrl = imageDataUrl ?? image_data_url;
   const base64 = imageBase64 ?? image_base64;
   const contentType = imageContentType ?? image_content_type;
@@ -54,13 +54,11 @@ export async function createOutPass(req: Request, res: Response) {
     }
   }
 
-  if (!finalImageUrl) {
-    return res.status(400).json({ error: "image_url is required (or provide imageDataUrl/imageBase64)" });
-  }
+  // Image is optional. If none provided, keep it null in DB.
 
   const outpass = await prisma.outPass.create({
     data: {
-      image_url: finalImageUrl,
+      image_url: finalImageUrl ?? null,
       days,
       start_date: new Date(start_date),
       end_date: new Date(end_date),
@@ -88,7 +86,7 @@ export async function getOutPass(req: Request, res: Response) {
 export async function updateOutPass(req: Request, res: Response) {
   const { id } = req.params;
   const { image_url, days, start_date, end_date } = req.body as {
-    image_url?: string;
+    image_url?: string | null;
     days?: number;
     start_date?: string;
     end_date?: string;
