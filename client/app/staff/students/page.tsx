@@ -39,6 +39,7 @@ type StudentDetails = {
   roommates: Array<{ id: string; roll_no: string; name: string | null }>;
   outpasses: Array<{ id: string; start_date: string; end_date: string; days: number; image_url: string | null }>;
   mess_concessions: Array<{ id: string; start_date: string; End_date: string; days: number; image_url: string | null }>;
+  fines: Array<{ id: string; amount: number; fine_date: string; paid_date: string | null }>;
 };
 
 function parseBulkStudents(input: string, mode: "csv" | "json"): StudentCreate[] {
@@ -785,6 +786,47 @@ export default function StudentsPage() {
                                             <td className="p-2">{mc.image_url ? "Yes" : "—"}</td>
                                           </tr>
                                         ))}
+                                      </tbody>
+                                    </table>
+                                  </div>
+                                )}
+                              </div>
+
+                              <div className="space-y-2 md:col-span-2">
+                                <div className="text-sm font-medium border-t border-foreground/10 pt-4 mt-2">Fines Ledger</div>
+                                {details.fines.length === 0 ? (
+                                  <div className="text-sm opacity-70">No fines recorded.</div>
+                                ) : (
+                                  <div className="overflow-auto border border-foreground/10 rounded-lg">
+                                    <table className="w-full text-sm">
+                                      <thead className="bg-background/50">
+                                        <tr>
+                                          <th className="text-left p-2 border-b border-foreground/10">Date Issued</th>
+                                          <th className="text-left p-2 border-b border-foreground/10">Amount</th>
+                                          <th className="text-left p-2 border-b border-foreground/10">Status</th>
+                                        </tr>
+                                      </thead>
+                                      <tbody>
+                                        {details.fines.map((f) => {
+                                          const isPaid = f.paid_date !== null;
+                                          return (
+                                            <tr key={f.id} className="border-b border-foreground/10 last:border-b-0">
+                                              <td className="p-2 font-mono text-xs">{new Date(f.fine_date).toLocaleDateString()}</td>
+                                              <td className="p-2 font-semibold">₹{f.amount}</td>
+                                              <td className="p-2">
+                                                {isPaid ? (
+                                                  <span className="inline-flex text-xs px-2 py-0.5 rounded font-medium bg-green-500/10 text-green-700 dark:text-green-400 border border-green-500/20">
+                                                    Paid on {new Date(f.paid_date!).toLocaleDateString()}
+                                                  </span>
+                                                ) : (
+                                                  <span className="inline-flex text-xs px-2 py-0.5 rounded font-medium bg-red-500/10 text-red-700 dark:text-red-400 border border-red-500/20">
+                                                    Unpaid
+                                                  </span>
+                                                )}
+                                              </td>
+                                            </tr>
+                                          );
+                                        })}
                                       </tbody>
                                     </table>
                                   </div>

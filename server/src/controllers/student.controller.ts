@@ -315,9 +315,10 @@ export async function getStudentDetails(req: Request, res: Response) {
 
   const roommates = (student.Room?.students ?? []).filter((s) => s.id !== student.id);
 
-  const [outpasses, messConcessions] = await Promise.all([
+  const [outpasses, messConcessions, fines] = await Promise.all([
     prisma.outPass.findMany({ where: { student_id: student.id }, orderBy: { start_date: "desc" } }),
     prisma.messConcession.findMany({ where: { student_id: student.id }, orderBy: { start_date: "desc" } }),
+    prisma.fine.findMany({ where: { student_id: student.id }, orderBy: { fine_date: "desc" } }),
   ]);
 
   return res.status(200).json({
@@ -344,6 +345,7 @@ export async function getStudentDetails(req: Request, res: Response) {
       : null,
     outpasses,
     mess_concessions: messConcessions,
+    fines,
   });
 }
 
