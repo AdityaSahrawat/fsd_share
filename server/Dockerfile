@@ -17,7 +17,7 @@ RUN pnpm install --frozen-lockfile
 COPY . .
 
 # Generate Prisma Client (outputs to src/generated/prisma)
-RUN pnpm run generate
+RUN DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy" DIRECT_URL="postgresql://dummy:dummy@localhost:5432/dummy" pnpm run generate
 
 # Build TypeScript to dist
 RUN pnpm run build
@@ -36,14 +36,9 @@ WORKDIR /app
 ENV NODE_ENV="production"
 ENV PORT=3010
 
-# Note: In production you MUST provide the DATABASE_URL environment variable 
-# when running the container (e.g., docker run -e DATABASE_URL=...).
-
-# Copy dependencies, built output, and the generated prisma client
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/dist ./dist
-# We must copy src because the custom Prisma generated client lives inside src/generated/prisma
 COPY --from=builder /app/src/generated/prisma ./src/generated/prisma
 
 EXPOSE 3010
